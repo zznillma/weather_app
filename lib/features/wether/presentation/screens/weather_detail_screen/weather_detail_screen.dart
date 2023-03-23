@@ -2,8 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:weather_app/features/wether/data/models/weather_model.dart';
-import 'package:weather_app/features/wether/presentation/logic/bloc/weather_bloc.dart';
-import 'package:weather_app/internal/dependencies/get_it.dart';
 import 'package:weather_app/internal/helpers/utils.dart';
 
 class WeatherDetailScreen extends StatelessWidget {
@@ -21,7 +19,7 @@ class WeatherDetailScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      backgroundColor: Colors.blue[200],
+      backgroundColor: backgroundHelper(weatherModel.weather!.first.main ?? ''),
       body: Center(
         child: Column(
           children: [

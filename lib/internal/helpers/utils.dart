@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 convertDate(int timestemp) {
@@ -22,4 +23,20 @@ convertWeekDay(int timestemp) {
   // print('formateDate === $dateConverter');
 
   return dateConverter;
+}
+
+backgroundHelper(String weather) {
+  switch (weather) {
+    case "Clouds":
+      return Colors.blue[100];
+
+    case "Rain":
+      return Colors.grey[400];
+
+    case "Clear":
+      return Colors.blue;
+
+    default:
+      return Colors.black;
+  }
 }
