@@ -31,80 +31,93 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Center(
-            child: SizedBox(
-              width: 200.w,
-              child: TextField(
-                onChanged: (value) {
-                  if (controller.text.isNotEmpty) {
-                    isActive = true;
-                  } else {
-                    isActive = false;
-                  }
+          Image.asset(
+            'assets/images/pogoda.jpeg',
+            fit: BoxFit.cover,
+            height: 1.sh,
+            width: 1.sw,
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: SizedBox(
+                  width: 200.w,
+                  child: TextField(
+                    
+                    onChanged: (value) {
+                      if (controller.text.isNotEmpty) {
+                        isActive = true;
+                      } else {
+                        isActive = false;
+                      }
 
-                  setState(() {});
-                },
-                style: const TextStyle(color: Colors.black),
-                controller: controller,
-                decoration: InputDecoration(
-                  hintText: 'Введите город...',
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10).r,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10).r,
+                      setState(() {});
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    controller: controller,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white60,
+                      hintText: 'Введите город...',
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10).r,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10).r,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-          SizedBox(height: 40.h),
-          BlocConsumer<WeatherBloc, WeatherState>(
-              bloc: bloc,
-              listener: (context, state) {
-                if (state is WeatherLoadingState) {
-                  isLoading = true;
-                }
+              SizedBox(height: 40.h),
+              BlocConsumer<WeatherBloc, WeatherState>(
+                  bloc: bloc,
+                  listener: (context, state) {
+                    if (state is WeatherLoadingState) {
+                      isLoading = true;
+                    }
 
-                if (state is WeatherErrorState) {
-                  isLoading = false;
+                    if (state is WeatherErrorState) {
+                      isLoading = false;
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.error.message.toString()),
-                    ),
-                  );
-                }
-
-                if (state is WeatherLoadedState) {
-                  isLoading = false;
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          WeatherDetailScreen(weatherModel: state.weatherModel),
-                    ),
-                  );
-                }
-              },
-              builder: (context, state) {
-                return isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: isActive
-                                ? Colors.blue
-                                : Colors.blue.withOpacity(0.5)),
-                        onPressed: () {
-                          bloc.add(GetWeatherEvent(city: controller.text));
-                        },
-                        child: const Text('Далее'),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.error.message.toString()),
+                        ),
                       );
-              })
+                    }
+
+                    if (state is WeatherLoadedState) {
+                      isLoading = false;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WeatherDetailScreen(
+                              weatherModel: state.weatherModel),
+                        ),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    return isLoading
+                        ? const CircularProgressIndicator()
+                        : ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: isActive
+                                    ? Colors.blue
+                                    : Colors.blue.withOpacity(0.5)),
+                            onPressed: () {
+                              bloc.add(GetWeatherEvent(city: controller.text));
+                            },
+                            child: const Text('Далее'),
+                          );
+                  })
+            ],
+          ),
         ],
       ),
     );
