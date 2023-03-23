@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:weather_app/features/wether/presentation/logic/bloc/weather_bloc.dart';
 import 'package:weather_app/features/wether/presentation/screens/weather_detail_screen/weather_detail_screen.dart';
+import 'package:weather_app/internal/dependencies/get_it.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -12,11 +15,16 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   late TextEditingController controller;
   late bool isActive;
+  late WeatherBloc bloc;
+  bool isLoading = false;
 
   @override
   void initState() {
     controller = TextEditingController();
     isActive = false;
+
+    bloc = getIt<WeatherBloc>();
+
     super.initState();
   }
 
@@ -36,10 +44,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   } else {
                     isActive = false;
                   }
-                  
+
                   setState(() {});
                 },
-                style: TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.black),
                 controller: controller,
                 decoration: InputDecoration(
                   hintText: 'Введите город...',
@@ -54,23 +62,49 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           SizedBox(height: 40.h),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isActive ? Colors.blue : Colors.blue.withOpacity(0.5)),
-            onPressed: () {
-              if (isActive) {
-                Navigator.push(
+          BlocConsumer<WeatherBloc, WeatherState>(
+              bloc: bloc,
+              listener: (context, state) {
+                if (state is WeatherLoadingState) {
+                  isLoading = true;
+                }
+
+                if (state is WeatherErrorState) {
+                  isLoading = false;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.error.message.toString()),
+                    ),
+                  );
+                }
+
+                if (state is WeatherLoadedState) {
+                  isLoading = false;
+
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => WeatherDetail(
-                        city: controller.text,
-                      ),
-                    ));
-              }
-            },
-            child: Text('Далее'),
-          )
+                      builder: (context) =>
+                          WeatherDetailScreen(weatherModel: state.weatherModel),
+                    ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: isActive
+                                ? Colors.blue
+                                : Colors.blue.withOpacity(0.5)),
+                        onPressed: () {
+                          bloc.add(GetWeatherEvent(city: controller.text));
+                        },
+                        child: const Text('Далее'),
+                      );
+              })
         ],
       ),
     );
