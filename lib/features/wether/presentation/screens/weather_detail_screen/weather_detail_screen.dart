@@ -46,17 +46,13 @@ class WeatherDetailScreen extends StatelessWidget {
                 fontSize: 17.sp,
               ),
             ),
-            CachedNetworkImage(
-              imageUrl:
-                  'https://openweathermap.org/img/wn/${weatherModel.weather!.first.icon}@4x.png',
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  Container(
-                alignment: Alignment.center,
-                child: CircularProgressIndicator(),
-                height: 40,
-                width: 40,
+            SizedBox(
+              height: 300,
+              width: 300,
+              child: Image.asset(
+                weatherImage(weatherModel.weather!.first.icon.toString()),
+                fit: BoxFit.cover,
               ),
-              // errorWidget: (context, url, error) => Icon(Icons.error),
             ),
             Text(
               '${weatherModel.main!.temp!.toDouble().ceil() - 273.15.ceil()}°',
